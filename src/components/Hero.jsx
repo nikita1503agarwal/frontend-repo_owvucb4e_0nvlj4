@@ -1,14 +1,58 @@
 import Spline from '@splinetool/react-spline'
-import { motion } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 export default function Hero() {
+  const containerRef = useRef(null)
+
+  // Scroll-linked transforms for parallax on the Spline canvas and glow orb
+  const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end start'] })
+  const parallaxY = useTransform(scrollYProgress, [0, 1], [0, 140])
+  const parallaxScale = useTransform(scrollYProgress, [0, 1], [1, 1.15])
+  const glowY = useTransform(scrollYProgress, [0, 1], [0, 220])
+
+  // Mouse reactive glow position (falls back to center on touch)
+  const [mouse, setMouse] = useState({ x: 0.5, y: 0.4 })
+  useEffect(() => {
+    const onMove = (e) => {
+      const { innerWidth: w, innerHeight: h } = window
+      const x = e.clientX / w
+      const y = e.clientY / h
+      setMouse({ x, y })
+    }
+    window.addEventListener('mousemove', onMove)
+    return () => window.removeEventListener('mousemove', onMove)
+  }, [])
+
+  // Smoothly follow mouse with memoized style
+  const glowStyle = useMemo(() => ({
+    left: `calc(${mouse.x * 100}% - 200px)`,
+    top: `calc(${mouse.y * 100}% - 200px)`,
+  }), [mouse])
+
   return (
-    <section id="home" className="relative isolate overflow-hidden pt-32 pb-20 sm:pt-40 sm:pb-28">
+    <section ref={containerRef} id="home" className="relative isolate overflow-hidden pt-32 pb-20 sm:pt-40 sm:pb-28">
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950" />
-        <div className="absolute inset-0">
+
+        {/* Scroll-reactive Spline background */}
+        <motion.div style={{ y: parallaxY, scale: parallaxScale }} className="absolute inset-0 will-change-transform">
           <Spline scene="https://prod.spline.design/4cHQr84zOGAHOehh/scene.splinecode" style={{ width: '100%', height: '100%' }} />
-        </div>
+        </motion.div>
+
+        {/* Interactive glow orb that follows cursor + scroll ("the ball") */}
+        <motion.div
+          aria-hidden
+          style={{ y: glowY, ...glowStyle }}
+          className="pointer-events-none absolute h-[400px] w-[400px] rounded-full opacity-60 blur-3xl"
+        >
+          <div className="h-full w-full rounded-full" style={{
+            background: 'radial-gradient(closest-side, rgba(168,85,247,0.45), rgba(79,70,229,0.30), rgba(236,72,153,0.18), transparent 70%)',
+            filter: 'saturate(120%)',
+            mixBlendMode: 'screen',
+          }} />
+        </motion.div>
+
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/10 to-slate-950" />
       </div>
 

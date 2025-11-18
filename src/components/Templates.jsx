@@ -1,3 +1,5 @@
+import { motion } from 'framer-motion'
+
 export default function Templates() {
   const templates = [
     { name: 'SaaS Onboarding Concierge', tag: 'Product', price: '$59' },
@@ -17,8 +19,15 @@ export default function Templates() {
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {templates.map((t) => (
-            <div key={t.name} className="rounded-2xl border border-white/10 bg-white/5 p-6 hover:border-white/20 transition-colors">
+          {templates.map((t, i) => (
+            <motion.div
+              key={t.name}
+              initial={{ opacity: 0, y: 16, scale: 0.98 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.45, delay: i * 0.05 }}
+              className="group rounded-2xl border border-white/10 bg-white/5 p-6 hover:border-white/20 transition-colors"
+            >
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs rounded-full bg-white/10 border border-white/10 px-2 py-1 text-slate-300">{t.tag}</span>
                 <span className="text-white text-sm font-semibold">{t.price}</span>
@@ -29,7 +38,8 @@ export default function Templates() {
                 <button className="rounded-lg bg-white text-slate-900 px-3 py-2 text-xs font-semibold hover:bg-slate-200">Preview</button>
                 <button className="rounded-lg border border-white/15 bg-white/5 text-white px-3 py-2 text-xs font-semibold hover:bg-white/10">Use template</button>
               </div>
-            </div>
+              <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </motion.div>
           ))}
         </div>
       </div>

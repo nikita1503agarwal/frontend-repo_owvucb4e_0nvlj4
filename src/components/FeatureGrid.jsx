@@ -1,4 +1,5 @@
 import { Zap, Database, Bot, Workflow, Store, Shield } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 export default function FeatureGrid() {
   const features = [
@@ -19,14 +20,21 @@ export default function FeatureGrid() {
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-white/[0.03] p-6 hover:border-white/20 transition-colors">
+          {features.map(({ icon: Icon, title, desc }, i) => (
+            <motion.div
+              key={title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.5, delay: i * 0.06 }}
+              className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-white/[0.03] p-6 hover:border-white/20 transition-colors"
+            >
               <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 ring-1 ring-white/20">
                 <Icon className="text-white" size={18} />
               </div>
               <h3 className="text-white font-semibold mb-1">{title}</h3>
               <p className="text-sm text-slate-300 leading-6">{desc}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
